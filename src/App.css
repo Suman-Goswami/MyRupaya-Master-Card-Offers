@@ -1,38 +1,161 @@
+/* General styling */
+body {
+  background: linear-gradient(90deg, #ffde6b 0%, #f3f8f0 100%);
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
 .App {
   text-align: center;
+  padding: 20px;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+h1 {
+  font-size: 24px;
+  color: #333;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Container for search input and dropdown */
+.dropdown {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto;
+}
+
+/* Search input styling */
+#cardSearch {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Dropdown styling */
+.search-dropdown {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+  background-color: white;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+/* Card grid styling */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 50px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.card {
+  background-color: #d2e4c7;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: left;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card img {
+  width: 100%;
+  max-width: 120px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.card-info {
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.card-info h3 {
+  font-size: 18px;
+  margin-top: 5px;
+}
+
+.card-info p {
+  margin-top: 5px;
+}
+
+.learn-more {
+  display: inline-block;
+  margin-top: auto;
+  color: #007bff;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.learn-more:hover {
+  text-decoration: underline;
+}
+
+/* Alternative message styling */
+.alt {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Responsive styles */
+@media (min-width: 480px) {
+  /* Show two cards in a row for small screens */
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+@media (min-width: 600px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  to {
-    transform: rotate(360deg);
+
+  .card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .card img {
+    margin-right: 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .card img {
+    margin: 0 auto 15px auto;
   }
 }
