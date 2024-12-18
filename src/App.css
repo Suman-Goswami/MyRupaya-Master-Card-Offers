@@ -65,11 +65,12 @@ h1 {
 }
 
 .card {
-  background-color: #d2e4c7;
+  background-color: #39641D;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
   text-align: left;
+  color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
 }
