@@ -48,6 +48,7 @@ h1 {
   background-color: white;
   border-bottom: 1px solid #eee;
   transition: background-color 0.2s ease;
+  border: none;    
 }
 
 .dropdown-item:hover {

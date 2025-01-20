@@ -120,13 +120,22 @@ const App = () => {
     const input = event.target.value;
     setSearchInput(input);
     setShowDropdown(true); // Show dropdown when typing in search input
-
-    if (!input) {
-      // Clear offers when input is cleared
+  
+    // Check if the input is a valid card from the list
+    const isValidCard = csvFiles.some((card) =>
+      card.toLowerCase().includes(input.toLowerCase())
+    );
+  
+    if (!input || isValidCard) {
+      setCardData([]); // Clear offers when input is cleared or valid card
+      setSelectedCard(""); // Reset selected card
+    } else {
+      // Set message when input is not valid
       setCardData([]);
       setSelectedCard("");
     }
   };
+  
 
   const filteredCards = csvFiles.filter((card) =>
     card.toLowerCase().includes(searchInput.toLowerCase())
@@ -134,6 +143,28 @@ const App = () => {
 
   return (
     <div className="App">
+    {/* Navbar Component */}
+    <nav style={styles.navbar}>
+  <div style={styles.logoContainer}>
+    <a href="https://www.myrupaya.in/">
+      <img
+        src="https://static.wixstatic.com/media/f836e8_26da4bf726c3475eabd6578d7546c3b2~mv2.jpg/v1/crop/x_124,y_0,w_3152,h_1458/fill/w_909,h_420,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/dark_logo_white_background.jpg"
+        alt="MyRupaya Logo"
+        style={styles.logo}
+      />
+    </a>
+    {/* Move the links here */}
+    <div
+      style={{
+        ...styles.linksContainer,
+      }}
+    >
+      <a href="https://www.myrupaya.in/" style={styles.link}>
+        Home
+      </a>
+    </div>
+  </div>
+</nav>
       <h1>Credit Card Offers</h1>
 
       <div className="dropdown">
@@ -160,41 +191,83 @@ const App = () => {
       </div>
 
       <div id="cardInfoContainer" className="card-grid">
-        {searchInput && selectedCard && cardData.length > 0 ? (
-          cardData.map((item, index) => (
-            <div key={index} className="card">
-              <img src={item.Image} alt={item.Title} />
-              <div className="card-info">
-                <h3>{item.Title}</h3>
-                <p>
-                  <strong>Country:</strong> {item.Country}
-                </p>
-                <p>
-                  <strong>Offers:</strong> {item.Offers}
-                </p>
-              </div>
-              <a
-                href={item.Link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="learn-more"
-              >
-                Learn More
-              </a>
-            </div>
-          ))
-        ) : searchInput && selectedCard ? (
-          <p className="alt">No offers found for the selected card.</p>
-        ) : (
-          searchInput && (
-            <p className="alt">
-              Please select a valid credit card from the list.
-            </p>
-          )
-        )}
+  {searchInput && selectedCard && cardData.length > 0 ? (
+    cardData.map((item, index) => (
+      <div key={index} className="card">
+        <img src={item.Image} alt={item.Title} />
+        <div className="card-info">
+          <h3>{item.Title}</h3>
+          <p>
+            <strong>Country:</strong> {item.Country}
+          </p>
+          <p>
+            <strong>Offers:</strong> {item.Offers}
+          </p>
+        </div>
+        <a
+          href={item.Link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="learn-more"
+        >
+          Learn More
+        </a>
       </div>
+    ))
+  ) : searchInput && !csvFiles.some((card) => card.toLowerCase().includes(searchInput.toLowerCase())) ? (
+    <p className="alt" style={styles.centerMessage}>
+      Please select a valid credit card from the list.
+    </p>
+  ) : null}
+</div>
+
+
     </div>
   );
+};
+const styles = {
+  navbar: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "10px 20px",
+    backgroundColor: "#CDD1C1",
+  },
+  logoContainer: {
+    display: "flex",
+    alignItems: "center",
+  },
+  logo: {
+    width: "100px",
+    height: "100px",
+    marginRight: "20px",
+  },
+  linksContainer: {
+    display: "flex",
+    gap: "35px",
+    flexWrap: "wrap",
+    marginLeft: "40px", // Adjust spacing from the logo
+  },
+  link: {
+    textDecoration: "none",
+    color: "black",
+    fontSize: "18px", // Increased font size
+    fontFamily: "Arial, sans-serif",
+    transition: "color 0.3s ease", // Smooth transition effect
+  },
+  mobileMenuOpen: {
+    display: "block",
+  },
+  centerMessage: {
+    color: "red",              // Red color for the message
+    textAlign: "center",       // Center align the text horizontally
+    position: "absolute",      // Position it absolutely to center vertically and horizontally
+    top: "50%",                // 50% from the top of the page
+    left: "50%",               // 50% from the left of the page
+    transform: "translate(-50%, -50%)", // Adjust to truly center
+    fontSize: "20px",          // Adjust font size as needed
+    fontFamily: "Arial, sans-serif", // Font style
+  },
 };
 
 export default App;
