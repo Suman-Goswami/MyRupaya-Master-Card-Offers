@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
 import "./App.css";
 
@@ -7,6 +7,15 @@ const App = () => {
   const [selectedCard, setSelectedCard] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [showDropdown, setShowDropdown] = useState(true);
+  const [debouncedSearchInput, setDebouncedSearchInput] = useState("");
+
+  // Debounce the search input (300ms delay)
+  useEffect(() => {
+    const timerId = setTimeout(() => {
+      setDebouncedSearchInput(searchInput);
+    }, 300);
+    return () => clearTimeout(timerId);
+  }, [searchInput]);
 
   const csvFiles = [
     "Axis Bank Buzz Credit Card",
@@ -88,7 +97,7 @@ const App = () => {
   const handleCardChange = async (cardName) => {
     setSelectedCard(cardName);
     setSearchInput(cardName);
-    setShowDropdown(false); // Hide dropdown on card selection
+    setShowDropdown(false);
     setCardData([]);
 
     if (cardName) {
@@ -103,7 +112,6 @@ const App = () => {
         download: true,
         header: true,
         complete: (results) => {
-          // Filter the data to include only offers with Country as "India"
           const filteredData = results.data.filter(
             (item) => item.Country === "India"
           );
@@ -119,52 +127,34 @@ const App = () => {
   const handleSearchChange = (event) => {
     const input = event.target.value;
     setSearchInput(input);
-    setShowDropdown(true); // Show dropdown when typing in search input
-  
-    // Check if the input is a valid card from the list
-    const isValidCard = csvFiles.some((card) =>
-      card.toLowerCase().includes(input.toLowerCase())
-    );
-  
-    if (!input || isValidCard) {
-      setCardData([]); // Clear offers when input is cleared or valid card
-      setSelectedCard(""); // Reset selected card
-    } else {
-      // Set message when input is not valid
-      setCardData([]);
-      setSelectedCard("");
-    }
+    setShowDropdown(true);
   };
-  
 
-  const filteredCards = csvFiles.filter((card) =>
-    card.toLowerCase().includes(searchInput.toLowerCase())
-  );
+  const filteredCards = csvFiles.filter((card) => {
+    if (!debouncedSearchInput) return false;
+    const searchTerms = debouncedSearchInput.toLowerCase().split(' ');
+    const cardLower = card.toLowerCase();
+    return searchTerms.every(term => cardLower.includes(term));
+  });
 
   return (
     <div className="App">
-    {/* Navbar Component */}
-    <nav style={styles.navbar}>
-  <div style={styles.logoContainer}>
-    <a href="https://www.myrupaya.in/">
-      <img
-        src="https://static.wixstatic.com/media/f836e8_26da4bf726c3475eabd6578d7546c3b2~mv2.jpg/v1/crop/x_124,y_0,w_3152,h_1458/fill/w_909,h_420,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/dark_logo_white_background.jpg"
-        alt="MyRupaya Logo"
-        style={styles.logo}
-      />
-    </a>
-    {/* Move the links here */}
-    <div
-      style={{
-        ...styles.linksContainer,
-      }}
-    >
-      <a href="https://www.myrupaya.in/" style={styles.link}>
-        Home
-      </a>
-    </div>
-  </div>
-</nav>
+      <nav style={styles.navbar}>
+        <div style={styles.logoContainer}>
+          <a href="https://www.myrupaya.in/">
+            <img
+              src="https://static.wixstatic.com/media/f836e8_26da4bf726c3475eabd6578d7546c3b2~mv2.jpg/v1/crop/x_124,y_0,w_3152,h_1458/fill/w_909,h_420,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/dark_logo_white_background.jpg"
+              alt="MyRupaya Logo"
+              style={styles.logo}
+            />
+          </a>
+          <div style={styles.linksContainer}>
+            <a href="https://www.myrupaya.in/" style={styles.link}>
+              Home
+            </a>
+          </div>
+        </div>
+      </nav>
       <h1>Credit Card Offers</h1>
 
       <div className="dropdown">
@@ -175,56 +165,65 @@ const App = () => {
           onChange={handleSearchChange}
           placeholder="Enter credit card name"
         />
-        {showDropdown && searchInput && (
+        {showDropdown && debouncedSearchInput && (
           <div className="search-dropdown">
-            {filteredCards.map((card, index) => (
-              <div
-                key={index}
-                className="dropdown-item"
-                onClick={() => handleCardChange(card)}
-              >
-                {card}
+            {filteredCards.length > 0 ? (
+              filteredCards.map((card, index) => (
+                <div
+                  key={index}
+                  className="dropdown-item"
+                  onClick={() => handleCardChange(card)}
+                >
+                  {card}
+                </div>
+              ))
+            ) : (
+              <div className="dropdown-item no-results">
+                No matching cards found
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
 
       <div id="cardInfoContainer" className="card-grid">
-  {searchInput && selectedCard && cardData.length > 0 ? (
-    cardData.map((item, index) => (
-      <div key={index} className="card">
-        <img src={item.Image} alt={item.Title} />
-        <div className="card-info">
-          <h3>{item.Title}</h3>
-          <p>
-            <strong>Country:</strong> {item.Country}
+        {searchInput && selectedCard && cardData.length > 0 ? (
+          cardData.map((item, index) => (
+            <div key={index} className="card">
+              <img src={item.Image} alt={item.Title} />
+              <div className="card-info">
+                <h3>{item.Title}</h3>
+                <p>
+                  <strong>Country:</strong> {item.Country}
+                </p>
+                <p>
+                  <strong>Offers:</strong> {item.Offers}
+                </p>
+              </div>
+              <a
+                href={item.Link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="learn-more"
+              >
+                Learn More
+              </a>
+            </div>
+          ))
+        ) : searchInput && !csvFiles.some((card) => 
+            debouncedSearchInput.toLowerCase().split(' ').every(term => 
+              card.toLowerCase().includes(term)
+            )
+          ) ? (
+          <p className="alt" style={styles.centerMessage}>
+            Please select a valid credit card from the list.
           </p>
-          <p>
-            <strong>Offers:</strong> {item.Offers}
-          </p>
-        </div>
-        <a
-          href={item.Link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="learn-more"
-        >
-          Learn More
-        </a>
+        ) : null}
       </div>
-    ))
-  ) : searchInput && !csvFiles.some((card) => card.toLowerCase().includes(searchInput.toLowerCase())) ? (
-    <p className="alt" style={styles.centerMessage}>
-      Please select a valid credit card from the list.
-    </p>
-  ) : null}
-</div>
-
-
     </div>
   );
 };
+
 const styles = {
   navbar: {
     display: "flex",
@@ -246,27 +245,24 @@ const styles = {
     display: "flex",
     gap: "35px",
     flexWrap: "wrap",
-    marginLeft: "40px", // Adjust spacing from the logo
+    marginLeft: "40px",
   },
   link: {
     textDecoration: "none",
     color: "black",
-    fontSize: "18px", // Increased font size
+    fontSize: "18px",
     fontFamily: "Arial, sans-serif",
-    transition: "color 0.3s ease", // Smooth transition effect
-  },
-  mobileMenuOpen: {
-    display: "block",
+    transition: "color 0.3s ease",
   },
   centerMessage: {
-    color: "red",              // Red color for the message
-    textAlign: "center",       // Center align the text horizontally
-    position: "absolute",      // Position it absolutely to center vertically and horizontally
-    top: "50%",                // 50% from the top of the page
-    left: "50%",               // 50% from the left of the page
-    transform: "translate(-50%, -50%)", // Adjust to truly center
-    fontSize: "20px",          // Adjust font size as needed
-    fontFamily: "Arial, sans-serif", // Font style
+    color: "red",
+    textAlign: "center",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    fontSize: "20px",
+    fontFamily: "Arial, sans-serif",
   },
 };
 
